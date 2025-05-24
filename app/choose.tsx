@@ -10,6 +10,17 @@ import { starterPokemons, availableTables } from '@/data/pokemons';
 import { ArrowLeft, ArrowRight } from 'lucide-react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
+// Import shopPokemons from the shop file or define it here if not exported
+const shopPokemons = Array.from({ length: 50 }, (_, i) => {
+  const id = i + 1;
+  return {
+    id,
+    name: `Pokemon #${id}`,
+    imageUrl: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`,
+    price: 100 + (id % 5) * 20, // Vary price a bit
+  };
+});
+
 export default function ChooseScreen() {
   const { state, dispatch } = useGame();
   const [pokemons, setPokemons] = useState<Pokemon[]>([]);
@@ -20,30 +31,17 @@ export default function ChooseScreen() {
 
   console.log('Evolved Pokemons:', state.evolvedPokemons);
 
-  // Fetch Pokémon data on component mount
+  // Show all owned Pokémon (starter + shop)
   useEffect(() => {
-    const loadPokemon = async () => {
-      try {
-        setLoading(true);
-        const fetchedPokemon = await fetchStarterPokemon();
-        
-        if (fetchedPokemon.length > 0) {
-          setPokemons(fetchedPokemon);
-        } else {
-          // Use fallback data if API fails
-          setPokemons(starterPokemons);
-        }
-      } catch (error) {
-        console.error('Error loading Pokémon:', error);
-        // Use fallback data
-        setPokemons(starterPokemons);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadPokemon();
-  }, []);
+    setLoading(true);
+    // Get all owned Pokémon IDs
+    const ownedIds = state.ownedPokemons ?? [];
+    // Get Pokémon details from starterPokemons and shopPokemons
+    const allPokemons = [...starterPokemons, ...shopPokemons];
+    const ownedPokemons = allPokemons.filter(p => ownedIds.includes(p.id));
+    setPokemons(ownedPokemons);
+    setLoading(false);
+  }, [state.ownedPokemons]);
 
   // Handle Pokémon selection
   const handleSelectPokemon = (pokemon: Pokemon) => {
