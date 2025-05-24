@@ -32,13 +32,20 @@ export default function ChooseScreen() {
 
   console.log('Evolved Pokemons:', state.evolvedPokemons);
 
-  // Show all owned Pokémon (starter + shop)
+  // Show all owned Pokémon (starter + shop), avoid duplicates by ID (prefer starterPokemons)
   useEffect(() => {
     setLoading(true);
-    // Get all owned Pokémon IDs
     const ownedIds = state.ownedPokemons ?? [];
-    // Get Pokémon details from starterPokemons and shopPokemons
-    const allPokemons = [...starterPokemons, ...shopPokemons];
+    // Merge shopPokemons and starterPokemons, prefer starterPokemons for duplicate IDs
+    const allPokemonsMap = new Map();
+    [...shopPokemons, ...starterPokemons].forEach(p => {
+      allPokemonsMap.set(p.id, p);
+    });
+    // Now overwrite with starterPokemons (so their names/images take precedence)
+    starterPokemons.forEach(p => {
+      allPokemonsMap.set(p.id, p);
+    });
+    const allPokemons = Array.from(allPokemonsMap.values());
     const ownedPokemons = allPokemons.filter(p => ownedIds.includes(p.id));
     setPokemons(ownedPokemons);
     setLoading(false);
@@ -80,99 +87,103 @@ export default function ChooseScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {step === 'pokemon' ? (
-        // Pokémon selection step
-        <>
-          <Text style={styles.title}>Choose Your Pokémon</Text>
-          <Text style={styles.subtitle}>
-            Select a Pokémon to start your multiplication training
-          </Text>
+      <View style={styles.mainContent}>
+        {step === 'pokemon' ? (
+          // Pokémon selection step
+          <>
+            <Text style={styles.title}>Choose Your Pokémon</Text>
+            <Text style={styles.subtitle}>
+              Select a Pokémon to start your multiplication training
+            </Text>
 
-          <FlatList
-            data={pokemons}
-            renderItem={({ item }) => (
-              <PokemonCard
-                pokemon={item}
-                onSelect={() => handleSelectPokemon(item)}
-                isSelected={state.selectedPokemon?.id === item.id}
-              />
-            )}
-            keyExtractor={(item) => item.id.toString()}
-            numColumns={Platform.OS === 'web' ? 3 : 2}
-            key={numColumns}
-            contentContainerStyle={styles.pokemonList}
-          />
-        </>
-      ) : (
-        // Table selection step
-        <>
-          <View style={styles.header}>
-            <TouchableOpacity 
-              style={styles.backButton}
-              onPress={handleBackToPokemon}
-            >
-              <ArrowLeft size={24} color="#333" />
-              <Text style={styles.backButtonText}>Back</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity 
-              style={styles.summaryButton}
-              onPress={handleGoToSummary}
-            >
-              <Text style={styles.summaryButtonText}>Progress</Text>
-              <ArrowRight size={20} color="#4285F4" />
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.pokemonPreview}>
-            {state.selectedPokemon && (() => {
-              // Find the latest evolution for the selected Pokémon
-              const evolutions = state.evolvedPokemons.filter(
-                evo => evo.pokemonId === state.selectedPokemon!.id
-              );
-              const latestEvolution = evolutions.length > 0 ? evolutions[evolutions.length - 1] : null;
-              const displayPokemon = latestEvolution
-                ? { ...state.selectedPokemon, name: latestEvolution.to.name, imageUrl: latestEvolution.to.imageUrl }
-                : state.selectedPokemon;
-
-              return (
-                <PokemonCard 
-                  pokemon={displayPokemon}
-                  size="small"
+            <FlatList
+              data={pokemons}
+              renderItem={({ item }) => (
+                <PokemonCard
+                  pokemon={item}
+                  onSelect={() => handleSelectPokemon(item)}
+                  isSelected={state.selectedPokemon?.id === item.id}
                 />
-              );
-            })()}
-            <View style={styles.instructionContainer}>
-              <Text style={styles.title}>Choose a Table</Text>
-              <Text style={styles.subtitle}>
-                Complete tables to help your Pokémon evolve!
-              </Text>
-            </View>
-          </View>
+              )}
+              keyExtractor={(item) => item.id.toString()}
+              numColumns={Platform.OS === 'web' ? 3 : 2}
+              key={numColumns}
+              contentContainerStyle={styles.pokemonList}
+            />
+          </>
+        ) : (
+          // Table selection step
+          <>
+            <View style={styles.header}>
+              <TouchableOpacity 
+                style={styles.backButton}
+                onPress={handleBackToPokemon}
+              >
+                <ArrowLeft size={24} color="#333" />
+                <Text style={styles.backButtonText}>Back</Text>
+              </TouchableOpacity>
 
-          <FlatList
-            data={availableTables}
-            renderItem={({ item }) => (
-              <TableCard
-                table={item}
-                isCompleted={state.completedTables.includes(item)}
-                onSelect={handleSelectTable}
-              />
-            )}
-            keyExtractor={(item) => item.toString()}
-            numColumns={Platform.OS === 'web' ? 3 : 2}
-            contentContainerStyle={styles.tableList}
-          />
-        </>
-      )}
-      {/* Bottom bar: Points and My Pokémon button aligned */}
-      <View style={styles.bottomBar}>
-        <View style={styles.ellipseButton}>
-          <Text style={styles.ellipseButtonText}>Points: {isNaN(Number(state.points)) ? 0 : state.points}</Text>
+              <TouchableOpacity 
+                style={styles.summaryButton}
+                onPress={handleGoToSummary}
+              >
+                <Text style={styles.summaryButtonText}>Progress</Text>
+                <ArrowRight size={20} color="#4285F4" />
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.pokemonPreview}>
+              {state.selectedPokemon && (() => {
+                // Find the latest evolution for the selected Pokémon
+                const evolutions = state.evolvedPokemons.filter(
+                  evo => evo.pokemonId === state.selectedPokemon!.id
+                );
+                const latestEvolution = evolutions.length > 0 ? evolutions[evolutions.length - 1] : null;
+                const displayPokemon = latestEvolution
+                  ? { ...state.selectedPokemon, name: latestEvolution.to.name, imageUrl: latestEvolution.to.imageUrl }
+                  : state.selectedPokemon;
+
+                return (
+                  <PokemonCard 
+                    pokemon={displayPokemon}
+                    size="small"
+                  />
+                );
+              })()}
+              <View style={styles.instructionContainer}>
+                <Text style={styles.title}>Choose a Table</Text>
+                <Text style={styles.subtitle}>
+                  Complete tables to help your Pokémon evolve!
+                </Text>
+              </View>
+            </View>
+
+            <FlatList
+              data={availableTables}
+              renderItem={({ item }) => (
+                <TableCard
+                  table={item}
+                  isCompleted={state.completedTables.includes(item)}
+                  onSelect={handleSelectTable}
+                />
+              )}
+              keyExtractor={(item) => item.toString()}
+              numColumns={Platform.OS === 'web' ? 3 : 2}
+              contentContainerStyle={styles.tableList}
+            />
+          </>
+        )}
+
+        <View style={styles.bottomBarWrapper}>
+          <View style={styles.bottomBar}>
+            <TouchableOpacity style={styles.ellipseButton} activeOpacity={0.7}>
+              <Text style={styles.ellipseButtonText}>Points: {isNaN(Number(state.points)) ? 0 : state.points}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.ellipseButton} onPress={() => router.push('/mypokemon')} activeOpacity={0.7}>
+              <Text style={styles.ellipseButtonText}>My Pokémon</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-        <TouchableOpacity style={styles.ellipseButton} onPress={() => router.push('/mypokemon')}>
-          <Text style={styles.ellipseButtonText}>My Pokémon</Text>
-        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
@@ -182,7 +193,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
-    padding: 16,
+    paddingHorizontal: 16, // for overall spacing
   },
   loadingContainer: {
     flex: 1,
@@ -263,17 +274,34 @@ const styles = StyleSheet.create({
     flex: 1,
     marginLeft: 16,
   },
+  mainContent: {
+    flex: 1,
+    width: '100%',
+    alignSelf: 'center',
+    justifyContent: 'space-between',
+  },
+  bottomBarWrapper: {
+    width: '100%',
+    alignItems: 'center',
+    marginBottom: 32,
+  },
+  bottomBar: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '90%', // leaves 5% on each side
+  },
   ellipseButton: {
     backgroundColor: '#fff',
     borderRadius: 30,
     paddingVertical: 12,
+    paddingHorizontal: 24, // controls button width
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
     borderColor: '#3B4CCA',
     height: 48,
-    flex: 1,
-    marginHorizontal: 6,
+    marginHorizontal: 8, // gap between buttons
   },
   ellipseButtonText: {
     color: '#3B4CCA',
@@ -281,16 +309,5 @@ const styles = StyleSheet.create({
     fontSize: 18,
     textAlign: 'center',
     width: '100%',
-  },
-  bottomBar: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 32,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 24,
-    zIndex: 10,
   },
 });

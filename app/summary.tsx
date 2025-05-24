@@ -155,6 +155,15 @@ export default function SummaryScreen() {
           <Text style={styles.resetButtonText}>Reset Game</Text>
         </TouchableOpacity>
       </ScrollView>
+
+      <View style={styles.bottomBar}>
+        <TouchableOpacity style={[styles.ellipseButton, styles.ellipseButtonLeft]} activeOpacity={0.7}>
+          <Text style={styles.ellipseButtonText}>Points: {isNaN(Number(state.points)) ? 0 : state.points}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.ellipseButton} onPress={() => router.push('/mypokemon')} activeOpacity={0.7}>
+          <Text style={styles.ellipseButtonText}>My Pokémon</Text>
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 }
@@ -337,6 +346,36 @@ const styles = StyleSheet.create({
   },
   resetButtonText: {
     color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  bottomBar: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 32,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
+    zIndex: 10,
+  },
+  ellipseButton: {
+    backgroundColor: '#fff',
+    borderRadius: 30,
+    paddingVertical: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#3B4CCA',
+    height: 48,
+    flex: 1,
+  },
+  ellipseButtonLeft: {
+    marginRight: 12,
+  },
+  ellipseButtonText: {
+    color: '#3B4CCA',
     fontSize: 16,
     fontWeight: 'bold',
   },

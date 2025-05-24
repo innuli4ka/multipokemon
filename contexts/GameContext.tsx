@@ -34,7 +34,7 @@ const initialState: GameState = {
   evolvedPokemons: [],
   isLoading: true,
   points: 0,
-  ownedPokemons: [],
+  ownedPokemons: [1, 4, 7, 25, 133], // Give all starters by default
 };
 
 // Create the context
