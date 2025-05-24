@@ -30,6 +30,7 @@ export default function TableScreen() {
   const [completedTasks, setCompletedTasks] = useState<Task[]>([]);
   const [showSuccess, setShowSuccess] = useState(false);
   const [isNavigating, setIsNavigating] = useState(false);
+  const [pointsEarned, setPointsEarned] = useState(0);
 
   // Animation values
   const progressWidth = useSharedValue(0);
@@ -115,6 +116,29 @@ export default function TableScreen() {
       withSpring(1.1, { damping: 2 }),
       withSpring(1, { damping: 2 })
     );
+
+    // Award points for perfect or completed table
+    const easyTables = [1, 2, 3, 10];
+    const hardTables = [4, 5, 6, 7, 8, 9];
+    const isPerfect = tasks.length > 0 && completedTasks.length === tasks.length && completedTasks.every(t => t.isCorrect);
+    let earned = 0;
+    if (isPerfect) {
+      if (easyTables.includes(state.currentTable as number)) {
+        earned = 10;
+      } else if (hardTables.includes(state.currentTable as number)) {
+        earned = 25;
+      }
+    } else {
+      if (easyTables.includes(state.currentTable as number)) {
+        earned = 3;
+      } else if (hardTables.includes(state.currentTable as number)) {
+        earned = 7;
+      }
+    }
+    setPointsEarned(earned);
+    if (earned > 0) {
+      dispatch({ type: 'ADD_POINTS', payload: earned });
+    }
     
     // Mark table as completed
     dispatch({ 
@@ -122,11 +146,11 @@ export default function TableScreen() {
       payload: state.currentTable as number 
     });
     
-    // Navigate to evolution screen after delay
+    // Navigate to evolution screen after delay, passing pointsEarned
     setTimeout(() => {
-      router.push('/evolve');
+      router.push({ pathname: '/evolve', params: { points: earned } });
     }, 2000);
-  }, [state.currentTable, isNavigating]);
+  }, [state.currentTable, isNavigating, tasks, completedTasks, dispatch]);
 
   // Animation style for progress bar
   const progressAnimStyle = useAnimatedStyle(() => {
@@ -206,6 +230,9 @@ export default function TableScreen() {
           <Text style={styles.successSubtext}>
             You completed the {state.currentTable}× table!
           </Text>
+          {pointsEarned > 0 && (
+            <Text style={styles.pointsEarnedText}>You earned {pointsEarned} points!</Text>
+          )}
         </Animated.View>
       )}
     </View>
@@ -296,5 +323,11 @@ const styles = StyleSheet.create({
   successSubtext: {
     fontSize: 20,
     color: '#333',
+  },
+  pointsEarnedText: {
+    fontSize: 18,
+    color: '#3B4CCA',
+    fontWeight: 'bold',
+    marginTop: 12,
   },
 });

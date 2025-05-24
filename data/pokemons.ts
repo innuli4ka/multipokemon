@@ -22,6 +22,11 @@ export const starterPokemons: Pokemon[] = [
     name: 'Pikachu',
     imageUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png',
   },
+  {
+    id: 133,
+    name: 'Eevee',
+    imageUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/133.png',
+  },
 ];
 
 // Map of evolution chains (simplified for fallback)
@@ -88,8 +93,20 @@ export const evolutionChains = {
       name: 'Raichu',
       imageUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/26.png',
     }
-  ]
+  ],
+  133: [
+    {
+      id: 133,
+      name: 'Eevee',
+      imageUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/133.png',
+    },
+    {
+      id: 134,
+      name: 'Vaporeon',
+      imageUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/134.png',
+    }
+  ],
 };
 
 // Available multiplication tables
-export const availableTables = [1, 2, 3, 4, 5, 8, 9, 10, 11, 12];
+export const availableTables = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];

@@ -60,6 +60,10 @@ export default function HomeScreen() {
   
   return (
     <View style={styles.container}>
+      {/* Points badge */}
+      <View style={styles.pointsBadge}>
+        <Text style={styles.pointsText}>Points: {state.points}</Text>
+      </View>
       <Animated.View style={[styles.logoContainer, animatedStyle]}>
         <Text style={styles.titlePart1}>Pokémon</Text>
         <Text style={styles.titlePart2}>Multiplication</Text>
@@ -88,6 +92,14 @@ export default function HomeScreen() {
             <Text style={styles.buttonText}>Start Training</Text>
           </TouchableOpacity>
         )}
+        {/* My Pokémon Button */}
+        <TouchableOpacity style={styles.myPokemonButton} onPress={() => router.push('/mypokemon')}>
+          <Text style={styles.myPokemonButtonText}>My Pokémon</Text>
+        </TouchableOpacity>
+        {/* Shop Button */}
+        <TouchableOpacity style={styles.shopButton} onPress={() => router.push('/shop')}>
+          <Text style={styles.shopButtonText}>Shop</Text>
+        </TouchableOpacity>
       </View>
       
       <View style={styles.footerContainer}>
@@ -189,5 +201,74 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: 'center',
     color: '#666',
+  },
+  myPokemonButton: {
+    backgroundColor: '#fff',
+    borderRadius: 30,
+    paddingVertical: 12,
+    paddingHorizontal: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 1,
+    width: '100%',
+    maxWidth: 300,
+    marginTop: 16,
+    borderWidth: 1,
+    borderColor: '#3B4CCA',
+  },
+  myPokemonButtonText: {
+    color: '#3B4CCA',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  shopButton: {
+    backgroundColor: '#fff',
+    borderRadius: 30,
+    paddingVertical: 12,
+    paddingHorizontal: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 1,
+    width: '100%',
+    maxWidth: 300,
+    marginTop: 12,
+    borderWidth: 1,
+    borderColor: '#FF9800',
+    alignSelf: 'center',
+  },
+  shopButtonText: {
+    color: '#FF9800',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  pointsBadge: {
+    position: 'absolute',
+    top: 20,
+    right: 30,
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    paddingVertical: 6,
+    paddingHorizontal: 18,
+    borderWidth: 1,
+    borderColor: '#3B4CCA',
+    zIndex: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  pointsText: {
+    color: '#3B4CCA',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
 });

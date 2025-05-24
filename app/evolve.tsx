@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, ActivityIndicator, Platform } from 'react-native';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useGame } from '@/contexts/GameContext';
 import { fetchEvolutionChain, fetchPokemonByName, extractEvolutionStages } from '@/utils/fetchPokemon';
 import { evolutionChains } from '@/data/pokemons';
@@ -10,6 +10,8 @@ import { ArrowRight } from 'lucide-react-native';
 
 export default function EvolveScreen() {
   const { state, dispatch } = useGame();
+  const params = useLocalSearchParams();
+  const points = params.points ? Number(params.points) : 0;
   const [loading, setLoading] = useState(true);
   const [evolutionStages, setEvolutionStages] = useState<Pokemon[]>([]);
   const [currentStage, setCurrentStage] = useState(0);
@@ -48,14 +50,14 @@ export default function EvolveScreen() {
         }
         
         // Use fallback data if API fails or no evolution chain available
-        const fallbackChain = evolutionChains[state.selectedPokemon.id];
+        const fallbackChain = (evolutionChains as Record<number, any[]>)[state.selectedPokemon.id];
         if (fallbackChain) {
           setEvolutionStages(fallbackChain);
         }
       } catch (error) {
         console.error('Error loading evolution chain:', error);
         // Use fallback data
-        const fallbackChain = evolutionChains[state.selectedPokemon.id];
+        const fallbackChain = (evolutionChains as Record<number, any[]>)[state.selectedPokemon.id];
         if (fallbackChain) {
           setEvolutionStages(fallbackChain);
         }
@@ -193,6 +195,9 @@ export default function EvolveScreen() {
   
   return (
     <View style={styles.container}>
+      {points > 0 && (
+        <Text style={styles.pointsEarnedText}>You earned {points} points!</Text>
+      )}
       <Text style={styles.title}>Your Pokémon is Evolving!</Text>
       <Text style={styles.subtitle}>
         You completed the {state.currentTable}× table!
@@ -322,5 +327,12 @@ const styles = StyleSheet.create({
   },
   disabledButton: {
     backgroundColor: '#cccccc',
+  },
+  pointsEarnedText: {
+    fontSize: 18,
+    color: '#3B4CCA',
+    fontWeight: 'bold',
+    marginBottom: 16,
+    textAlign: 'center',
   },
 });

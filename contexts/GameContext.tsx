@@ -9,6 +9,8 @@ interface GameState {
   currentTable: number | null;
   evolvedPokemons: Evolution[];
   isLoading: boolean;
+  points: number;
+  ownedPokemons: number[]; // store by id
 }
 
 // Define the actions for the reducer
@@ -19,7 +21,10 @@ type GameAction =
   | { type: 'ADD_EVOLUTION'; payload: Evolution }
   | { type: 'RESET_GAME' }
   | { type: 'RESTORE_STATE'; payload: GameState }
-  | { type: 'SET_LOADING'; payload: boolean };
+  | { type: 'SET_LOADING'; payload: boolean }
+  | { type: 'ADD_POINTS'; payload: number }
+  | { type: 'SPEND_POINTS'; payload: number }
+  | { type: 'ADD_OWNED_POKEMON'; payload: number };
 
 // Initial state
 const initialState: GameState = {
@@ -28,6 +33,8 @@ const initialState: GameState = {
   currentTable: null,
   evolvedPokemons: [],
   isLoading: true,
+  points: 0,
+  ownedPokemons: [],
 };
 
 // Create the context
@@ -78,6 +85,23 @@ const gameReducer = (state: GameState, action: GameAction): GameState => {
       return {
         ...state,
         isLoading: action.payload,
+      };
+    case 'ADD_POINTS':
+      return {
+        ...state,
+        points: state.points + action.payload,
+      };
+    case 'SPEND_POINTS':
+      return {
+        ...state,
+        points: Math.max(0, state.points - action.payload),
+      };
+    case 'ADD_OWNED_POKEMON':
+      return {
+        ...state,
+        ownedPokemons: state.ownedPokemons.includes(action.payload)
+          ? state.ownedPokemons
+          : [...state.ownedPokemons, action.payload],
       };
     default:
       return state;

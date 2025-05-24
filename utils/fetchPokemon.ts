@@ -7,7 +7,7 @@ const API_BASE_URL = 'https://pokeapi.co/api/v2';
 export const fetchStarterPokemon = async (): Promise<Pokemon[]> => {
   try {
     // Starter Pokémon IDs (simplified for our app)
-    const starterIds = [1, 4, 7, 25]; // Bulbasaur, Charmander, Squirtle, Pikachu
+    const starterIds = [1, 4, 7, 25, 133]; // Bulbasaur, Charmander, Squirtle, Pikachu, Eevee
 
     const pokemonPromises = starterIds.map(async (id) => {
       const response = await fetch(`${API_BASE_URL}/pokemon/${id}`);

@@ -18,6 +18,8 @@ export default function ChooseScreen() {
     state.selectedPokemon ? 'table' : 'pokemon'
   );
 
+  console.log('Evolved Pokemons:', state.evolvedPokemons);
+
   // Fetch Pokémon data on component mount
   useEffect(() => {
     const loadPokemon = async () => {
@@ -75,6 +77,8 @@ export default function ChooseScreen() {
     );
   }
 
+  const numColumns = Platform.OS === 'web' ? 4 : 2;
+
   return (
     <View style={styles.container}>
       {step === 'pokemon' ? (
@@ -95,18 +99,10 @@ export default function ChooseScreen() {
               />
             )}
             keyExtractor={(item) => item.id.toString()}
-            numColumns={Platform.OS === 'web' ? 4 : 2}
+            numColumns={Platform.OS === 'web' ? 3 : 2}
+            key={numColumns}
             contentContainerStyle={styles.pokemonList}
           />
-
-          {state.completedTables.length > 0 && (
-            <TouchableOpacity 
-              style={styles.summaryButton}
-              onPress={handleGoToSummary}
-            >
-              <Text style={styles.summaryButtonText}>View Progress</Text>
-            </TouchableOpacity>
-          )}
         </>
       ) : (
         // Table selection step
@@ -130,12 +126,23 @@ export default function ChooseScreen() {
           </View>
 
           <View style={styles.pokemonPreview}>
-            {state.selectedPokemon && (
-              <PokemonCard 
-                pokemon={state.selectedPokemon} 
-                size="small"
-              />
-            )}
+            {state.selectedPokemon && (() => {
+              // Find the latest evolution for the selected Pokémon
+              const evolutions = state.evolvedPokemons.filter(
+                evo => evo.pokemonId === state.selectedPokemon!.id
+              );
+              const latestEvolution = evolutions.length > 0 ? evolutions[evolutions.length - 1] : null;
+              const displayPokemon = latestEvolution
+                ? { ...state.selectedPokemon, name: latestEvolution.to.name, imageUrl: latestEvolution.to.imageUrl }
+                : state.selectedPokemon;
+
+              return (
+                <PokemonCard 
+                  pokemon={displayPokemon}
+                  size="small"
+                />
+              );
+            })()}
             <View style={styles.instructionContainer}>
               <Text style={styles.title}>Choose a Table</Text>
               <Text style={styles.subtitle}>
@@ -154,11 +161,20 @@ export default function ChooseScreen() {
               />
             )}
             keyExtractor={(item) => item.toString()}
-            numColumns={Platform.OS === 'web' ? 6 : 3}
+            numColumns={Platform.OS === 'web' ? 3 : 2}
             contentContainerStyle={styles.tableList}
           />
         </>
       )}
+      {/* Bottom bar: Points and My Pokémon button aligned */}
+      <View style={styles.bottomBar}>
+        <View style={styles.ellipseButton}>
+          <Text style={styles.ellipseButtonText}>Points: {isNaN(Number(state.points)) ? 0 : state.points}</Text>
+        </View>
+        <TouchableOpacity style={styles.ellipseButton} onPress={() => router.push('/mypokemon')}>
+          <Text style={styles.ellipseButtonText}>My Pokémon</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -247,5 +263,36 @@ const styles = StyleSheet.create({
   instructionContainer: {
     flex: 1,
     marginLeft: 16,
+  },
+  ellipseButton: {
+    backgroundColor: '#fff',
+    borderRadius: 30,
+    paddingVertical: 12,
+    paddingHorizontal: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#3B4CCA',
+    minWidth: 160,
+    height: 48,
+    flexDirection: 'row',
+  },
+  ellipseButtonText: {
+    color: '#3B4CCA',
+    fontWeight: 'bold',
+    fontSize: 18,
+    textAlign: 'center',
+    width: '100%',
+  },
+  bottomBar: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 32,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+    zIndex: 10,
   },
 });
