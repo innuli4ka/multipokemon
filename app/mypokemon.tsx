@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useGame } from '@/contexts/GameContext';
 import { starterPokemons, evolutionChains } from '@/data/pokemons';
 import { ArrowLeft } from 'lucide-react-native';
@@ -25,7 +26,7 @@ export default function MyPokemonScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
           <ArrowLeft size={24} color="#333" />
@@ -65,7 +66,7 @@ export default function MyPokemonScreen() {
           );
         })}
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -193,5 +194,9 @@ const styles = StyleSheet.create({
     color: '#3B4CCA',
     fontWeight: 'bold',
     fontSize: 16,
+  },
+  logo: {
+    width: 200,
+    height: 200,
   },
 }); 

@@ -7,6 +7,7 @@ import { evolutionChains } from '@/data/pokemons';
 import { Pokemon, Evolution } from '@/types/pokemon';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, withSequence, withDelay } from 'react-native-reanimated';
 import { ArrowRight } from 'lucide-react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function EvolveScreen() {
   const { state, dispatch } = useGame();
@@ -202,7 +203,7 @@ export default function EvolveScreen() {
   }
   
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       {/* Congrats and points earned */}
       <Text style={styles.congratsText}>🎉 Congrats!</Text>
       {points > 0 && (
@@ -284,7 +285,7 @@ export default function EvolveScreen() {
         <Text style={styles.continueButtonText}>Continue</Text>
         <ArrowRight size={20} color="#fff" />
       </TouchableOpacity>
-    </View>
+    </SafeAreaView>
   );
 }
 

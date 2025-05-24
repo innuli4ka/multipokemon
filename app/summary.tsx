@@ -5,6 +5,7 @@ import { useGame } from '@/contexts/GameContext';
 import PokemonCard from '@/components/PokemonCard';
 import { availableTables } from '@/data/pokemons';
 import { ArrowLeft } from 'lucide-react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function SummaryScreen() {
   const { state, dispatch } = useGame();
@@ -33,7 +34,7 @@ export default function SummaryScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity 
           style={styles.backButton} 
@@ -154,7 +155,7 @@ export default function SummaryScreen() {
           <Text style={styles.resetButtonText}>Reset Game</Text>
         </TouchableOpacity>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 

@@ -4,6 +4,7 @@ import { router } from 'expo-router';
 import { useGame } from '@/contexts/GameContext';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, withRepeat, withSequence, withDelay } from 'react-native-reanimated';
 import { Play } from 'lucide-react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function HomeScreen() {
   const { state, dispatch } = useGame();
@@ -59,7 +60,7 @@ export default function HomeScreen() {
   };
   
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       {/* Points badge */}
       <View style={styles.pointsBadge}>
         <Text style={styles.pointsText}>Points: {state.points}</Text>
@@ -110,7 +111,7 @@ export default function HomeScreen() {
           Complete tables to evolve your Pokémon
         </Text>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 

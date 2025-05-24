@@ -9,6 +9,7 @@ import { Pokemon } from '@/types/pokemon';
 import { starterPokemons, availableTables } from '@/data/pokemons';
 import { ArrowLeft, ArrowRight } from 'lucide-react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 // Import shopPokemons from the shop file or define it here if not exported
 const shopPokemons = Array.from({ length: 50 }, (_, i) => {
@@ -78,7 +79,7 @@ export default function ChooseScreen() {
   const numColumns = Platform.OS === 'web' ? 4 : 2;
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       {step === 'pokemon' ? (
         // Pokémon selection step
         <>
@@ -173,7 +174,7 @@ export default function ChooseScreen() {
           <Text style={styles.ellipseButtonText}>My Pokémon</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -266,14 +267,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 30,
     paddingVertical: 12,
-    paddingHorizontal: 30,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
     borderColor: '#3B4CCA',
-    minWidth: 160,
     height: 48,
-    flexDirection: 'row',
+    flex: 1,
+    marginHorizontal: 6,
   },
   ellipseButtonText: {
     color: '#3B4CCA',
