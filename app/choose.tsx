@@ -96,20 +96,22 @@ export default function ChooseScreen() {
               Select a Pokémon to start your multiplication training
             </Text>
 
-            <FlatList
-              data={pokemons}
-              renderItem={({ item }) => (
-                <PokemonCard
-                  pokemon={item}
-                  onSelect={() => handleSelectPokemon(item)}
-                  isSelected={state.selectedPokemon?.id === item.id}
-                />
-              )}
-              keyExtractor={(item) => item.id.toString()}
-              numColumns={Platform.OS === 'web' ? 3 : 2}
-              key={numColumns}
-              contentContainerStyle={styles.pokemonList}
-            />
+            {Array.isArray(pokemons) && (
+              <FlatList
+                data={pokemons}
+                renderItem={({ item }) => (
+                  <PokemonCard
+                    pokemon={item}
+                    onSelect={() => handleSelectPokemon(item)}
+                    isSelected={state.selectedPokemon?.id === item.id}
+                  />
+                )}
+                keyExtractor={(item) => item.id.toString()}
+                numColumns={Platform.OS === 'web' ? 3 : 2}
+                key={numColumns}
+                contentContainerStyle={styles.pokemonList}
+              />
+            )}
           </>
         ) : (
           // Table selection step
@@ -158,19 +160,21 @@ export default function ChooseScreen() {
               </View>
             </View>
 
-            <FlatList
-              data={availableTables}
-              renderItem={({ item }) => (
-                <TableCard
-                  table={item}
-                  isCompleted={state.completedTables.includes(item)}
-                  onSelect={handleSelectTable}
-                />
-              )}
-              keyExtractor={(item) => item.toString()}
-              numColumns={Platform.OS === 'web' ? 3 : 2}
-              contentContainerStyle={styles.tableList}
-            />
+            {state.selectedPokemon && (
+              <FlatList
+                data={availableTables}
+                renderItem={({ item }) => (
+                  <TableCard
+                    table={item}
+                    isCompleted={(state.completedTablesByPokemon[state.selectedPokemon?.id ?? 0] || []).includes(item)}
+                    onSelect={handleSelectTable}
+                  />
+                )}
+                keyExtractor={(item) => item.toString()}
+                numColumns={Platform.OS === 'web' ? 3 : 2}
+                contentContainerStyle={styles.tableList}
+              />
+            )}
           </>
         )}
 

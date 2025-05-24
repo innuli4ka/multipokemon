@@ -121,36 +121,40 @@ export default function TableScreen() {
     const easyTables = [1, 2, 3, 10];
     const hardTables = [4, 5, 6, 7, 8, 9];
     const isPerfect = tasks.length > 0 && completedTasks.length === tasks.length && completedTasks.every(t => t.isCorrect);
+    const completedTables = state.completedTablesByPokemon[state.selectedPokemon?.id || 0] || [];
+    const isFirstTime = !completedTables.includes(state.currentTable as number);
     let earned = 0;
+
     if (isPerfect) {
       if (easyTables.includes(state.currentTable as number)) {
-        earned = 10;
+        earned = isFirstTime ? 10 : 3;
       } else if (hardTables.includes(state.currentTable as number)) {
-        earned = 25;
+        earned = isFirstTime ? 25 : 7;
       }
     } else {
       if (easyTables.includes(state.currentTable as number)) {
-        earned = 3;
+        earned = isFirstTime ? 3 : 1;
       } else if (hardTables.includes(state.currentTable as number)) {
-        earned = 7;
+        earned = isFirstTime ? 7 : 2;
       }
     }
+
     setPointsEarned(earned);
     if (earned > 0) {
       dispatch({ type: 'ADD_POINTS', payload: earned });
     }
     
-    // Mark table as completed
+    // Mark table as completed for this Pokémon
     dispatch({ 
       type: 'COMPLETE_TABLE', 
-      payload: state.currentTable as number 
+      payload: { pokemonId: state.selectedPokemon?.id ?? 0, table: state.currentTable as number }
     });
     
     // Navigate to evolution screen after delay, passing pointsEarned
     setTimeout(() => {
       router.push({ pathname: '/evolve', params: { points: earned } });
     }, 2000);
-  }, [state.currentTable, isNavigating, tasks, completedTasks, dispatch]);
+  }, [state.currentTable, isNavigating, tasks, completedTasks, dispatch, state.completedTablesByPokemon, state.selectedPokemon]);
 
   // Animation style for progress bar
   const progressAnimStyle = useAnimatedStyle(() => {

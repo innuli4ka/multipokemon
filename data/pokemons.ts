@@ -104,7 +104,17 @@ export const evolutionChains = {
       id: 134,
       name: 'Vaporeon',
       imageUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/134.png',
-    }
+    },
+    {
+      id: 135,
+      name: 'Jolteon',
+      imageUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/135.png',
+    },
+    {
+      id: 136,
+      name: 'Flareon',
+      imageUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/136.png',
+    },
   ],
 };
 

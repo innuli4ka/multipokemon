@@ -94,6 +94,9 @@ export default function EvolveScreen() {
       setCanEvolve(state.points >= 20 && currentStageIdx < evolutionStages.length - 1);
       setCurrentStage(currentStageIdx);
       setNextStage(nextStageIdx);
+      if (currentStageIdx >= evolutionStages.length - 1) {
+        setEvolving(false);
+      }
     }
   }, [loading, evolutionStages, state.points, state.evolvedPokemons]);
   
@@ -130,7 +133,48 @@ export default function EvolveScreen() {
       withTiming(1, { duration: 1000 })
     );
     
-    // Deduct points and evolve
+    // Custom Eevee logic
+    if (state.selectedPokemon?.id === 133) {
+      // Get all possible evolutions (excluding Eevee itself)
+      const possibleEvolutions = evolutionStages.slice(1);
+      // Get already obtained evolutions for Eevee
+      const obtained = state.evolvedPokemons
+        .filter(evo => evo.pokemonId === 133)
+        .map(evo => evo.to.name);
+      // Find remaining evolutions
+      const remaining = possibleEvolutions.filter(evo => !obtained.includes(evo.name));
+      if (remaining.length === 0) {
+        setAtMaxEvolution(true);
+        setEvolving(false);
+        return;
+      }
+      // Pick a random remaining evolution
+      const nextEvo = remaining[Math.floor(Math.random() * remaining.length)];
+      // Find current stage (Eevee or last evolved form)
+      const evolutions = state.evolvedPokemons.filter(evo => evo.pokemonId === 133);
+      let fromStage = evolutionStages[0];
+      if (evolutions.length > 0) {
+        const last = evolutions[evolutions.length - 1].to.name;
+        fromStage = evolutionStages.find(e => e.name === last) || evolutionStages[0];
+      }
+      dispatch({ type: 'SPEND_POINTS', payload: 20 });
+      const evolution: Evolution = {
+        pokemonId: 133,
+        from: {
+          name: fromStage.name,
+          imageUrl: fromStage.imageUrl
+        },
+        to: {
+          name: nextEvo.name,
+          imageUrl: nextEvo.imageUrl
+        },
+        tableCompleted: state.currentTable || 0
+      };
+      dispatch({ type: 'ADD_EVOLUTION', payload: evolution });
+      return;
+    }
+
+    // Default logic for other Pokémon
     if (evolutionStages[currentStage] && evolutionStages[nextStage]) {
       dispatch({ type: 'SPEND_POINTS', payload: 20 });
       const evolution: Evolution = {
@@ -229,8 +273,8 @@ export default function EvolveScreen() {
         </Animated.View>
         {/* Glow effect */}
         <Animated.View style={[styles.glowEffect, glowStyles]} />
-        {/* To Pokémon (only show if evolving) */}
-        {evolving && evolutionStages[nextStage] && (
+        {/* To Pokémon (only show if evolving and nextStage exists) */}
+        {evolving && evolutionStages[nextStage] && !atMaxEvolution && (
           <Animated.View style={[styles.pokemonContainer, styles.evolvedContainer, toStyles]}>
             <Image
               source={{ uri: evolutionStages[nextStage]?.imageUrl }}
@@ -239,6 +283,17 @@ export default function EvolveScreen() {
             />
             <Text style={styles.pokemonName}>{evolutionStages[nextStage]?.name}</Text>
           </Animated.View>
+        )}
+        {/* At max evolution, show the current (final) Pokémon image and name statically */}
+        {atMaxEvolution && (
+          <View style={[styles.pokemonContainer, styles.evolvedContainer]}>
+            <Image
+              source={{ uri: evolutionStages[currentStage]?.imageUrl }}
+              style={styles.pokemonImage}
+              resizeMode="contain"
+            />
+            <Text style={styles.pokemonName}>{evolutionStages[currentStage]?.name}</Text>
+          </View>
         )}
       </View>
       {/* Evolve Button and Info */}

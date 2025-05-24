@@ -12,8 +12,8 @@ export default function SummaryScreen() {
 
   // Calculate progress
   const totalTables = availableTables.length;
-  const completedTables = state.completedTables.length;
-  const progressPercentage = Math.round((completedTables / totalTables) * 100);
+  const completedTables = state.completedTablesByPokemon[state.selectedPokemon?.id ?? 0] || [];
+  const progressPercentage = Math.round((completedTables.length / totalTables) * 100);
 
   // Format completion date
   const formatDate = (date: Date) => {
@@ -62,7 +62,7 @@ export default function SummaryScreen() {
               />
               
               <View style={styles.statsContainer}>
-                <Text style={styles.statTitle}>Completed Tables: {completedTables}</Text>
+                <Text style={styles.statTitle}>Completed Tables: {completedTables.length}</Text>
                 <View style={styles.progressBarContainer}>
                   <View style={[styles.progressBar, { width: `${progressPercentage}%` }]} />
                   <Text style={styles.progressText}>{progressPercentage}%</Text>
@@ -78,20 +78,20 @@ export default function SummaryScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Completed Tables</Text>
           
-          {state.completedTables.length > 0 ? (
+          {completedTables.length > 0 ? (
             <View style={styles.tablesGrid}>
               {availableTables.map((table) => (
                 <View 
                   key={table}
                   style={[
                     styles.tableItem,
-                    state.completedTables.includes(table) && styles.completedTableItem
+                    completedTables.includes(table) && styles.completedTableItem
                   ]}
                 >
                   <Text 
                     style={[
                       styles.tableText,
-                      state.completedTables.includes(table) && styles.completedTableText
+                      completedTables.includes(table) && styles.completedTableText
                     ]}
                   >
                     {table}×

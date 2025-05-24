@@ -5,7 +5,7 @@ import { Pokemon, Evolution } from '@/types/pokemon';
 // Define the game state type
 interface GameState {
   selectedPokemon: Pokemon | null;
-  completedTables: number[];
+  completedTablesByPokemon: { [pokemonId: number]: number[] };
   currentTable: number | null;
   evolvedPokemons: Evolution[];
   isLoading: boolean;
@@ -17,7 +17,7 @@ interface GameState {
 type GameAction =
   | { type: 'SELECT_POKEMON'; payload: Pokemon }
   | { type: 'SET_CURRENT_TABLE'; payload: number }
-  | { type: 'COMPLETE_TABLE'; payload: number }
+  | { type: 'COMPLETE_TABLE'; payload: { pokemonId: number, table: number } }
   | { type: 'ADD_EVOLUTION'; payload: Evolution }
   | { type: 'RESET_GAME' }
   | { type: 'RESTORE_STATE'; payload: GameState }
@@ -29,7 +29,7 @@ type GameAction =
 // Initial state
 const initialState: GameState = {
   selectedPokemon: null,
-  completedTables: [],
+  completedTablesByPokemon: {},
   currentTable: null,
   evolvedPokemons: [],
   isLoading: true,
@@ -59,13 +59,17 @@ const gameReducer = (state: GameState, action: GameAction): GameState => {
         ...state,
         currentTable: action.payload,
       };
-    case 'COMPLETE_TABLE':
+    case 'COMPLETE_TABLE': {
+      const { pokemonId, table } = action.payload;
+      const prev = state.completedTablesByPokemon[pokemonId] || [];
       return {
         ...state,
-        completedTables: state.completedTables.includes(action.payload)
-          ? state.completedTables
-          : [...state.completedTables, action.payload],
+        completedTablesByPokemon: {
+          ...state.completedTablesByPokemon,
+          [pokemonId]: prev.includes(table) ? prev : [...prev, table],
+        },
       };
+    }
     case 'ADD_EVOLUTION':
       return {
         ...state,
@@ -118,9 +122,14 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         const savedState = await AsyncStorage.getItem('gameState');
         if (savedState) {
+          const parsed = JSON.parse(savedState);
+          // MIGRATION: Ensure completedTablesByPokemon is always an object
+          if (!parsed.completedTablesByPokemon || typeof parsed.completedTablesByPokemon !== 'object') {
+            parsed.completedTablesByPokemon = {};
+          }
           dispatch({
             type: 'RESTORE_STATE',
-            payload: JSON.parse(savedState),
+            payload: parsed,
           });
         } else {
           dispatch({ type: 'SET_LOADING', payload: false });
